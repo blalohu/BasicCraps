@@ -14,7 +14,7 @@ public class Craps {
     //consider making this function return int in order to pass a bet variable to main
     void comeOut() {
         boolean pass;
-        System.out.println("Make Your Passline Bet");
+        System.out.println("Pass or Don't Pass?");
 
         Scanner scanner = new Scanner(System.in);
         String setPass = scanner.next();
@@ -74,7 +74,7 @@ public class Craps {
             //go to point round
             //set point to int result
         }
-    //setup a loop from here to top
+    //set up a loop from here to top
     }
 }
 

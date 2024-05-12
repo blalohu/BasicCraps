@@ -1,17 +1,14 @@
 public class PayEvenBet extends Bet {
 
-    private static int winnings;
-
-    PayEvenBet(int bet) {
-        bet * 2
-        setWinnings(); = bet * 2;
+    int payoutEven(int bet) {
+        return bet * 2;
+    }
+    int payoutPush(int bet) {
+        return bet;
     }
 
-    public static int getWinnings(int bank) {
-        return winnings * 2;
-    }
 
-    public static void setWinnings() {
 
-    }
+
+
 }

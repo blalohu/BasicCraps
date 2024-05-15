@@ -3,50 +3,69 @@ import java.util.Scanner;
 
 public class Craps {
 
-    //this is the starting money for the player
-    //it is static because in no way should it ever be instanced.
+    public static final int[] passRelevant = {2, 3, 7, 11, 12};
     public static int bank = 100;
-    // I've commented out the other variables - for the points, the result, and the bet.
-    // Because these variables depend on the current 'round', it's probably easier if we just create them
-    // every time individually rather than keeping them around, which could cause problems.
-    //    static int point;
-    //    static int result;
-    //    static int bet;
-    // boolean pass; -- We don't want passing to be defined here, since it's defined by the 'come out'.
-    //boolean oddsBetActive;
-    //int oddsBet;
     // Let's also define a static Scanner for every function to use equally.
     // This is easier than making a new Scanner whenever we want to get user input.
-    private static Scanner crapsScanner = new Scanner(System.in);
+    private final static Scanner crapsScanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         startCrapsGame();
-        // A 'while' loop probably isn't what we want here - 'while' means 'keep repeating whatever's in the loop until the info there is false.
-        // We want to not do the point round if you won via a come out roll on the pass line,
-        // but that'd be easier with an if, I think. Since if we use a while, it'll wind up repeating the point round
-        // forever. Additionally, it'll be easier if we fully code in just the come-out first.
-        // In fact, right now, I'll just make adjustments as needed to get to the very first phase.
-        //  while (point != result && point != 7) {
-        //      pointRound();
-        //  }
     }
 
     private static void startCrapsGame() {
+        int index;
+
         System.out.println("A game of Craps begins.");
         Roll roll = new Roll();
+        int die1 = roll.die1;
+        int die2 = roll.die2;
         int result = roll.getResult();
-        comeOut(result); // Here we just pass the current game's rolled result into a function rather than having it as a global variable. This will be easier if we want to eventually run more craps games, etc.
+        comeOut(result, die1, die2); // Here we just pass the current game's rolled result into a function rather than having it as a global variable. This will be easier if we want to eventually run more craps games, etc.
         // We always do the come out no matter what.
-        if (result != 7 && result != 11 && result != 2 && result != 3 && result != 12) {
-            // TODO: Fully implement point round. This should include:
-            // 1. Prompt player to define their more complicated bet
-            // 2. Roll as needed
-            // 3. Payout as needed
-            // 4. End the game afterwards.
-        } else {
-            endGame();
+
+        for (index = 0; index < 5; index++) {
+            if (result != passRelevant[index]) {
+                System.out.println("The point is now on: " + result);
+                int point = result;
+                String placeBet;
+                do {
+                    System.out.println("Roll again shooter, or place more bets?");
+                    // TODO: Fully implement point round. This should include:
+                    // 1. Prompt player to define their more complicated bet
+                    // Note, this is a separate process for additional bets
+                    // The default bet still stands from the pass line
+                    placeBet = "";
+                    do {
+                        System.out.println("Type either bet or roll");
+                        placeBet = crapsScanner.next();
+                    }
+                    while (!placeBet.equalsIgnoreCase("bet") && !placeBet.equalsIgnoreCase("roll"));
+
+
+                    if (placeBet.equalsIgnoreCase("roll")) {
+                        // 2. Roll as needed
+                        Roll pointRoll = new Roll();
+                        result = pointRoll.getResult();
+                        pointRoll.die1 = die1;
+                        pointRoll.die2 = die2;
+                        pointRound(result, die1, die2, point);
+                    }
+                } while (result != point);
+
+                if (placeBet.equalsIgnoreCase("bet")) {
+                    //TODO: Make more complex bets
+                }
+
+                // 4. End the game afterwards.
+                //endGame();
+            }
+            if (index == 5) {
+                endGame();
+            }
         }
     }
+
 
     private static void endGame() {
         System.out.println("Game over.");
@@ -59,12 +78,9 @@ public class Craps {
         }
     }
 
-    private static void comeOut(int result) {
+    private static void comeOut(int result, int die1, int die2) {
         boolean pass = false;
-//        while (result == 7 || result == 11 || result == 2 || result == 3 || result == 12) { /* figure out how to array
-//        this list for neatness later */
-        // We don't want to use a while loop here either - technically, we should be asking about whether or not the player wants to pass
-        // no matter what. This while loop means technically nothing would happen unless those reults were rolled.
+
         System.out.println("Pass or Don't Pass?");
 
         // HERE is a case where we want to use a 'while' loop. Until we get pass or don't pass, we need to keep asking.
@@ -92,12 +108,12 @@ public class Craps {
         // We can just double when you win.
         // And we don't need to deduct when you lose, since we already deducted when you bet.
         // We also want to display the roll no matter what (to show that we'll move forwards to the next bet).
-        System.out.println("The roll is " + result + ".");
-
+        System.out.println("[" + die1 + "]" + " [" + die2 + "]");
+        payBet payout = new payBet();
         if (result == 7 || result == 11) {
             if (pass) {
                 System.out.println(result + " on the come out, pass pays even!");
-                bank = bank + bet * 2;
+                bank = payout.payEven(bet);
             }
             if (!pass) {
                 System.out.println(result + " on the come out, don't pass loses.");
@@ -109,7 +125,7 @@ public class Craps {
             }
             if (!pass) {
                 System.out.println("Craps out on the come out, don't pass pays even!");
-                bank = bank + bet * 2;
+                bank = payout.payEven(bet);
             }
         }
         if (result == 12) {
@@ -118,36 +134,19 @@ public class Craps {
             }
             if (!pass) {
                 System.out.println("Boxcars pushes don't pass, try again.");
+                bank = bank + bet;
             }
         }
     }
 
-//    void pointRound() {
-//        while (result != point && result != 7) {
-//            Roll pointRoll = new Roll();
-//            int result = pointRoll.getResult();
-//            if (pass) {
-//                if (result == point) {
-//                    bank = bank + comeOutBet.payoutEven(bet);
-//                    //do the motions here
-//                }
-//                if (result == 7) {
-//                    bank = bank - comeOutBet.payoutEven(bet);
-//                    //end loop
-//                }
-//            }
-//            if (!pass) {
-//                if (result == point) {
-//                    bank = bank - comeOutBet.payoutEven(bet);
-//                }
-//                if (result == 7) {
-//                    bank = bank + comeOutBet.payoutEven(bet);
-//                }
-//            }
-//        }
-//    }
-}
+    static void pointRound(int result, int die1, int die2, int point) {
+        if (result == point) {
+        //Conglaturations, Your Winner
+            // Payout as Needed
+        }
 
+    }
+}
 
 
 

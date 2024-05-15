@@ -6,6 +6,7 @@ public class Roll {
 
     public int getResult() {
         return die1 + die2;
+
     }
 }
 

@@ -1,4 +1,4 @@
-public class payBet {
+public class PayBet {
 
     //this is where all my bets are gonna go, I don't think I need to abstract them out to different classes
 
@@ -13,10 +13,18 @@ public class payBet {
     public int payOddsFiveNine(int bet) {
         //payout odds are 3:2
         return (int) (bet * 2.5);
-        //similar deal for all 5/9 odds bets, except in intervals of 5
+        //similar deal for all 5/9 odds bets, except in intervals of 2
     }
     public int payOddsFourTen(int bet) {
         //payout odds are 2:1
         return bet * 3;
+    }
+    public int payFieldTwo(int bet) {
+        //payout odds are 2:1
+        return bet * 3;
+    }
+    public int payFieldTwelve(int bet){
+        //payout odds are 3:1
+        return bet * 4;
     }
 }

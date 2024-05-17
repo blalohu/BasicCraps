@@ -27,4 +27,12 @@ public class PayBet {
         //payout odds are 3:1
         return bet * 4;
     }
+    public int payTwoTwelveSingle(int bet){
+        //payout odds are 30:1
+        return bet * 30;
+    }
+    public int payThreeEleven(int bet){
+        //payout odds are 15:1
+        return bet * 15;
+    }
 }

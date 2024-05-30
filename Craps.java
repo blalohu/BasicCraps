@@ -2,12 +2,24 @@ import java.util.Scanner;
 
 //TODO: Annotate the methods better to explain the code. Get in the habit of this.
 public class Craps {
-    public static boolean hardBetOn;
+    public static final int[] passRelevant = {2, 3, 7, 11, 12};
+    public static final String oddsRelevant = "4,5,6,8,9,10"; //string because it was misbehaving
+    public static final int[] fieldRelevant = {2, 3, 4, 9, 10, 11, 12};
     // Let's also define a static Scanner for every function to use equally.
     // This is easier than making a new Scanner whenever we want to get user input.
     private final static Scanner crapsScanner = new Scanner(System.in);
+    public static boolean hardBetOn;
     public static int bank = 100;
     public static int bankDelta = 0;
+    public static boolean pass;
+    public static boolean endSignal;
+    public static int pointRoundResult;
+    public static boolean oddsBetPayoutOn, oddsBetOn;
+    public static int oddsNumber, oddsBet;
+    public static boolean fieldPayoutOn, fieldBetOn;
+    public static int fieldBet;
+    public static boolean twoPayoutOn, threePayoutOn, elevenPayoutOn, twelvePayoutOn, hornPayoutOn, crapsPayoutOn, singleBetOn, twoBetOn, threeBetOn, elevenBetOn, twelveBetOn, hornBetOn, crapsBetOn;
+    public static int twoBet, threeBet, elevenBet, twelveBet, hornBet, crapsBet;
 
     public static void main(String[] args) {
         startCrapsGame();
@@ -36,10 +48,6 @@ public class Craps {
             endGame();
         }
     }
-
-
-    public static final int[] passRelevant = {2, 3, 7, 11, 12};
-    public static boolean pass;
 
     public static int comeOut(int result, int die1, int die2) {
         System.out.println("Pass or Don't Pass?");
@@ -104,16 +112,12 @@ public class Craps {
         return passBet;
     }
 
-    public static boolean endSignal;
-    public static int pointRoundResult;
-
     static void pointRound(int point, int passBet, boolean pass) {
         String placeBet;
         int die1 = 0;
         int die2 = 0;
 
 
-       if (!endSignal) {
         PayBet payout = new PayBet();
         do {
             System.out.println("The point is now on: " + point);
@@ -127,7 +131,7 @@ public class Craps {
 
 
             if (placeBet.equalsIgnoreCase("roll")) {
-                // 2. Roll as needed
+
                 Roll pointRoll = new Roll();
                 pointRoundResult = pointRoll.getResult();
                 die1 = pointRoll.die1;
@@ -139,17 +143,14 @@ public class Craps {
                     bank += payout.payEven(passBet);
                     bankDelta += payout.payEven(passBet);
                     oddsBetOn = false;
-                    endSignal = true;
-                    System.out.println(pointRoundResult + "PRR");
                     System.out.println(point + "p");
                 }
                 if (pointRoundResult == 7 && pass) {
                     System.out.println("Sevened out, bad luck!");
                     System.out.println("You lost " + passBet);
-                    System.out.println(pointRoundResult + "PRR");
-                    System.out.println(point + "p");
+
                     oddsBetOn = false;
-                    endSignal = true;
+
                 }
                 if (pointRoundResult == point && pass) {
                     bank = bank + passBet * 2; // This is the basic pass payout
@@ -158,17 +159,15 @@ public class Craps {
                     bank += payout.payEven(passBet);
                     bankDelta += payout.payEven(passBet);
                     oddsBetOn = false;
-                    endSignal = true;
-                    System.out.println(pointRoundResult + "PRR");
-                    System.out.println(point + "p");
+
+
                 }
                 if (pointRoundResult == point && !pass) {
                     System.out.println("You hit the point on don't pass, bad luck");
                     System.out.println("You lost " + passBet);
                     oddsBetOn = false;
-                    endSignal = true;
-                    System.out.println(pointRoundResult + "PRR");
-                    System.out.println(point + "p");
+
+
                 }
 
             }
@@ -251,14 +250,8 @@ public class Craps {
             calledBets(singleBetOn, pointRoundResult); //this handles the single number bets as well as craps and horn
 
             hardBets(hardBetOn, pointRoundResult, die1, die2); //this handles the "hard" bets AKA doubles
-        } while (pointRoundResult != point || pointRoundResult != 7); //TODO something is wrong with this statement, it keeps looping when it should
+        } while (pointRoundResult != point && pointRoundResult != 7); //TODO something is wrong with this statement, it keeps looping when it should
     }
-}
-
-
-    public static final String oddsRelevant = "4,5,6,8,9,10"; //string because it was misbehaving
-    public static boolean oddsBetPayoutOn, oddsBetOn;
-    public static int oddsNumber, oddsBet;
 
     static void oddsBet(boolean oddsBetOn, int result, int point) {
 
@@ -277,6 +270,8 @@ public class Craps {
                     System.out.println("We do not give change");
                     oddsBet = crapsScanner.nextInt();
                 }
+                bank -= oddsBet;
+                bankDelta -= oddsBet;
             }
             if (!oddsBetPayoutOn && !pass) {
                 System.out.println("You've placed odds against " + point);
@@ -289,7 +284,6 @@ public class Craps {
                 }
                 bank -= oddsBet;
                 bankDelta -= oddsBet;
-
             }
             if (pass && !oddsBetPayoutOn) {
                 System.out.println("Very well, you've placed " + oddsBet + " on " + point);
@@ -388,11 +382,6 @@ public class Craps {
         }
     }
 
-
-    public static boolean fieldPayoutOn, fieldBetOn;
-    public static final int[] fieldRelevant = {2, 3, 4, 9, 10, 11, 12};
-    public static int fieldBet;
-
     public static void fieldBet(boolean fieldBetOn, int result) {
 
 
@@ -435,10 +424,6 @@ public class Craps {
             fieldBetOn = false;
         }
     }
-
-    public static boolean twoPayoutOn, threePayoutOn, elevenPayoutOn, twelvePayoutOn, hornPayoutOn, crapsPayoutOn,
-            singleBetOn, twoBetOn, threeBetOn, elevenBetOn, twelveBetOn, hornBetOn, crapsBetOn;
-    public static int twoBet, threeBet, elevenBet, twelveBet, hornBet, crapsBet;
 
     static void calledBets(boolean singleBetOn, int result) {
         PayBet singleBet = new PayBet();
@@ -570,7 +555,6 @@ public class Craps {
         System.out.println("You made in total " + bankDelta + " chips this round.");
         System.out.println("Play again?");
         bankDelta = 0;
-        endSignal = false;
         String result = crapsScanner.next();
         if (result.equalsIgnoreCase("y")) {
             startCrapsGame(); // Start another game.

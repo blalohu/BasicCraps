@@ -7,7 +7,7 @@ public class Craps {
     public static final int[] fieldRelevant = {2, 3, 4, 9, 10, 11, 12};
     // Let's also define a static Scanner for every function to use equally.
     // This is easier than making a new Scanner whenever we want to get user input.
-    private final static Scanner crapsScanner = new Scanner(System.in);
+    final static Scanner crapsScanner = new Scanner(System.in);
     public static boolean hardBetOn;
     public static int bank = 100;
     public static int bankDelta = 0;
@@ -18,8 +18,8 @@ public class Craps {
     public static int oddsNumber, oddsBet;
     public static boolean fieldPayoutOn, fieldBetOn;
     public static int fieldBet;
-    public static boolean twoPayoutOn, threePayoutOn, elevenPayoutOn, twelvePayoutOn, hornPayoutOn, crapsPayoutOn, singleBetOn, twoBetOn, threeBetOn, elevenBetOn, twelveBetOn, hornBetOn, crapsBetOn;
-    public static int twoBet, threeBet, elevenBet, twelveBet, hornBet, crapsBet;
+
+
 
     public static void main(String[] args) {
         startCrapsGame();
@@ -189,31 +189,31 @@ public class Craps {
                         System.out.println("Pays 1:1. Snake Eyes is 2:1 and Boxcars are 3:1");
                         break;
                     case "ELEVEN":
-                        elevenBetOn = true;
-                        singleBetOn = elevenBetOn;
-                        System.out.println("Betting on Eleven, odds are 15:1");
+                        SingleBet elevenBet = new SingleBet();
+                        System.out.println("Betting on 11, odds 15:1");
+                        elevenBet.setBet(crapsScanner.nextInt(), false);
                         break;
                     case "TWO":
-                        twoBetOn = true;
-                        singleBetOn = twoBetOn;
+                        SingleBet twoBet = new SingleBet();
                         System.out.println("Betting on Snake Eyes, odds are 30:1");
+                        twoBet.setBet(crapsScanner.nextInt(), false);
                         break;
                     case "THREE":
-                        boolean threeBetOn = true;
-                        singleBetOn = threeBetOn;
+                        SingleBet threeBet = new SingleBet();
                         System.out.println("Betting Ace Deuce, odds are 15:1");
+                        threeBet.setBet(crapsScanner.nextInt(), false);
                         break;
                     case "TWELVE":
-                        boolean twelveBetOn = true;
-                        singleBetOn = twelveBetOn;
+                        SingleBet twelveBet = new SingleBet();
                         System.out.println("Betting on Boxcars, odds are 30:1");
+                        twelveBet.setBet(crapsScanner.nextInt(), false);
                         break;
                     case "HORN":
-                        boolean hornBetOn = true;
-                        singleBetOn = hornBetOn;
+                        SingleBet hornBet = new SingleBet();
                         System.out.println("Betting equally on 2, 3, 11 and 12");
                         System.out.println("We pay 27:4 on 2 and 12, and 3:1 on 3 or 11");
                         System.out.println("Multiples of 4 only please; we don't give change");
+                        hornBet.setBet(crapsScanner.nextInt(), true);
                         break;
                     case "CRAPS":
                         boolean crapsBetOn = true;
@@ -246,11 +246,42 @@ public class Craps {
             oddsBet(oddsBetOn, pointRoundResult, oddsNumber);
 
             fieldBet(fieldBetOn, pointRoundResult);
+            switch (pointRoundResult) {
+                case 2:
+                    if (hornBet.hornBetOn){
+                        bank += hornBet.payTwoTwelveHorn(hornBet.bet);
+                    }
+                    if (crapsBet.crapsBetOn){
+                        bank += crapsBet.payCraps(crapsBet.bet);
+                    }
+                    bank += twoBet.payTwoTwelveSingle(twoBet.bet);
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    break;
+                case 8:
+                    break;
+                case 9:
+                    break;
+                case 10:
+                    break;
+                case 11:
+                    bank += elevenBet.payThreeEleven(elevenBet.bet);
+                    break;
+                case 12:
+                    break;
+            }
 
-            calledBets(singleBetOn, pointRoundResult); //this handles the single number bets as well as craps and horn
 
             hardBets(hardBetOn, pointRoundResult, die1, die2); //this handles the "hard" bets AKA doubles
-        } while (pointRoundResult != point && pointRoundResult != 7); //TODO something is wrong with this statement, it keeps looping when it should
+        } while (pointRoundResult != point && pointRoundResult != 7);
     }
 
     static void oddsBet(boolean oddsBetOn, int result, int point) {
@@ -424,7 +455,7 @@ public class Craps {
             fieldBetOn = false;
         }
     }
-
+/*
     static void calledBets(boolean singleBetOn, int result) {
         PayBet singleBet = new PayBet();
         if (singleBetOn && twoBetOn) {
@@ -544,7 +575,7 @@ public class Craps {
             }
         }
     }
-
+*/
 
     static void hardBets(boolean hardBetOn, int result, int die1, int die2) {
 

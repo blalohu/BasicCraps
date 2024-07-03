@@ -72,4 +72,12 @@ public class PayBet {
         //payout odds are 7:1
         return bet * 8;
     }
+    public int payFourTenHard(int bet) {
+        //payout odds are 7:1
+        return bet * 8;
+    }
+    public int paySixEightHard(int bet) {
+        //payout odds are 9:1
+        return bet * 10;
+    }
 }

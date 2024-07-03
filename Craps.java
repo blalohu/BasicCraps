@@ -116,6 +116,12 @@ public class Craps {
         String placeBet;
         int die1 = 0;
         int die2 = 0;
+        SingleBet twoBet = null;
+        SingleBet threeBet = null;
+        SingleBet twelveBet = null;
+        SingleBet elevenBet = null;
+        SingleBet hornBet = null;
+        SingleBet crapsBet = null;
 
 
         PayBet payout = new PayBet();
@@ -159,31 +165,89 @@ public class Craps {
                     bank += payout.payEven(passBet);
                     bankDelta += payout.payEven(passBet);
                     oddsBetOn = false;
-
-
                 }
                 if (pointRoundResult == point && !pass) {
                     System.out.println("You hit the point on don't pass, bad luck");
                     System.out.println("You lost " + passBet);
                     oddsBetOn = false;
-
-
                 }
 
+                boolean payFlag = false;
+                switch (pointRoundResult) { //For Single Round bets being paid out.
+                    case 2:
+                        if (hornBet.hornBetOn) {
+                            bank += hornBet.payTwoTwelveHorn(hornBet.bet);
+                            bankDelta += hornBet.payTwoTwelveHorn(hornBet.bet);
+                            System.out.println("Two is in the horn! You were paid out " + hornBet.payTwoTwelveHorn(hornBet.bet));
+                            payFlag = true;
+                        }
+                        if (crapsBet.crapsBetOn) {
+                            bank += crapsBet.payCraps(crapsBet.bet);
+                            bankDelta += crapsBet.payCraps(crapsBet.bet);
+                            payFlag = true;
+                        }
+                        if (twoBet.twoBetOn) {
+                            bank += twoBet.payTwoTwelveSingle(twoBet.bet);
+                            bankDelta += twoBet.payTwoTwelveSingle(twoBet.bet);
+                        }
+                        break;
+                    case 3:
+                        if (hornBet.hornBetOn) {
+                            bank += hornBet.payThreeElevenHorn(hornBet.bet);
+                            bankDelta += hornBet.payThreeElevenHorn(hornBet.bet);
+                        }
+                        if (crapsBet.crapsBetOn) {
+                            bank += crapsBet.payCraps(crapsBet.bet);
+                            bankDelta += crapsBet.payCraps(crapsBet.bet);
+                        }
+                        if (threeBet.threeBetOn) {
+                            bank += threeBet.payThreeEleven(threeBet.bet);
+                            bankDelta += threeBet.payThreeEleven(threeBet.bet);
+                        }
+                        break;
+
+                    default: break; // for numbers 4 through 10, which do nothing in the single bet space.
+
+                    case 11:
+                        if (hornBet.hornBetOn) {
+                            bank += hornBet.payThreeElevenHorn(hornBet.bet);
+                            bankDelta += hornBet.payThreeElevenHorn(hornBet.bet);
+                            payFlag = true;
+                        }
+                        if (elevenBet.elevenBetOn) {
+                            bank += elevenBet.payThreeEleven(elevenBet.bet);
+                            bankDelta += elevenBet.payThreeEleven(elevenBet.bet);
+                            payFlag = true;
+                        }
+                        break;
+                    case 12:
+                        if (hornBet.hornBetOn) {
+                            bank += hornBet.payTwoTwelveHorn(hornBet.bet);
+                            bankDelta += hornBet.payTwoTwelveHorn(hornBet.bet);
+                        }
+                        if (crapsBet.crapsBetOn) {
+                            bank += crapsBet.payCraps(crapsBet.bet);
+                            bankDelta += crapsBet.payCraps(crapsBet.bet);
+                        }
+                        if (twoBet.twoBetOn) {
+                            bank += twelveBet.payTwoTwelveSingle(twelveBet.bet);
+                            bankDelta += twelveBet.payTwoTwelveSingle(twelveBet.bet);
+                        }
+                        break;
+                }
+
+                if (!payFlag) {
+                    System.out.println("Sorry bud, looks like odds weren't in your favor for the place bets.");
+                }
             }
 
-            SingleBet twoBet = null;
-            SingleBet threeBet = null;
-            SingleBet twelveBet = null;
-            SingleBet elevenBet = null;
-            SingleBet hornBet = null;
-            SingleBet crapsBet = null;
+
 
             if (placeBet.equalsIgnoreCase("bet")) {
                 System.out.println("What kind of bet are you making?");
                 String betType = crapsScanner.next();
                 betType = betType.toUpperCase();
-
+                int bet = 0;
                 switch (betType) {
                     case "ODDS":
                         oddsBetOn = true;
@@ -198,24 +262,35 @@ public class Craps {
                     case "ELEVEN":
                         elevenBet = new SingleBet();
                         System.out.println("Betting on 11, odds 15:1");
-                        elevenBet.setBet(crapsScanner.nextInt());
+                        bet = crapsScanner.nextInt();
+                        elevenBet.setBet(bet);
+                        bank -= bet;
+                        bankDelta -= bet;
+                        elevenBet.elevenBetOn = true;
                         break;
                     case "TWO":
                         twoBet = new SingleBet();
                         System.out.println("Betting on Snake Eyes, odds are 30:1");
-                        twoBet.setBet(crapsScanner.nextInt());
+                        bet = crapsScanner.nextInt();
+                        twoBet.setBet(bet);
+                        bank -= bet;
+                        bankDelta -= bet;
                         twoBet.twoBetOn = true;
                         break;
                     case "THREE":
                         threeBet = new SingleBet();
                         System.out.println("Betting Ace Deuce, odds are 15:1");
-                        threeBet.setBet(crapsScanner.nextInt());
+                        bet = crapsScanner.nextInt();
+                        threeBet.setBet(bet);
                         threeBet.threeBetOn = true;
                         break;
                     case "TWELVE":
                         twelveBet = new SingleBet();
                         System.out.println("Betting on Boxcars, odds are 30:1");
-                        twelveBet.setBet(crapsScanner.nextInt());
+                        bet = crapsScanner.nextInt();
+                        twelveBet.setBet(bet);
+                        bank -= bet;
+                        bankDelta -= bet;
                         twelveBet.twelveBetOn = true;
                         break;
                     case "HORN":
@@ -223,14 +298,20 @@ public class Craps {
                         System.out.println("Betting equally on 2, 3, 11 and 12");
                         System.out.println("We pay 27:4 on 2 and 12, and 3:1 on 3 or 11");
                         System.out.println("Multiples of 4 only please; we don't give change");
-                        hornBet.setBet(crapsScanner.nextInt());
+                        bet = crapsScanner.nextInt();
+                        hornBet.setBet(bet);
+                        bank -= bet;
+                        bankDelta -= bet;
                         hornBet.hornBetOn = true;
                         break;
                     case "CRAPS":
                         crapsBet = new SingleBet();
                         System.out.println("Betting on Craps: 2, 3 or 11.");
                         System.out.println("Odds are 7:1");
-                        crapsBet.setBet(crapsScanner.nextInt());
+                        bet = crapsScanner.nextInt();
+                        crapsBet.setBet(bet);
+                        bank -= bet;
+                        bankDelta -= bet;
                         crapsBet.crapsBetOn = true;
                         break;
                     case "HARD 4":
@@ -257,69 +338,8 @@ public class Craps {
             }
             oddsBet(oddsBetOn, pointRoundResult, oddsNumber);
             fieldBet(fieldBetOn, pointRoundResult);
-            switch (pointRoundResult) { //For Single Round bets being paid out.
-                case 2:
-                    if (hornBet.hornBetOn) {
-                        bank += hornBet.payTwoTwelveHorn(hornBet.bet);
-                        bankDelta += hornBet.payTwoTwelveHorn(hornBet.bet);
-                        System.out.println("Two is in the horn! You were paid out " + hornBet.payTwoTwelveHorn(hornBet.bet));
-                    }
-                    if (crapsBet.crapsBetOn) {
-                        bank += crapsBet.payCraps(crapsBet.bet);
-                        bankDelta += crapsBet.payCraps(crapsBet.bet);
-                    }
-                    if (twoBet.twoBetOn) {
-                        bank += twoBet.payTwoTwelveSingle(twoBet.bet);
-                        bankDelta += twoBet.payTwoTwelveSingle(twoBet.bet);
-                    }
-                    break;
-                case 3:
-                    if (hornBet.hornBetOn) {
-                        bank += hornBet.payThreeElevenHorn(hornBet.bet);
-                        bankDelta += hornBet.payThreeElevenHorn(hornBet.bet);
-                    }
-                    if (crapsBet.crapsBetOn) {
-                        bank += crapsBet.payCraps(crapsBet.bet);
-                        bankDelta += crapsBet.payCraps(crapsBet.bet);
-                    }
-                    if (threeBet.threeBetOn) {
-                        bank += threeBet.payThreeEleven(threeBet.bet);
-                        bankDelta += threeBet.payThreeEleven(threeBet.bet);
-                    }
-                    break;
-                default: // for numbers 4 through 10, which do nothing in the single bet space.
-                    break;
-                case 11:
-                    if (hornBet.hornBetOn) {
-                        bank += hornBet.payThreeElevenHorn(hornBet.bet);
-                        bankDelta += hornBet.payThreeElevenHorn(hornBet.bet);
-                    }
-                    if (elevenBet.elevenBetOn) {
-                        bank += elevenBet.payThreeEleven(elevenBet.bet);
-                        bankDelta += elevenBet.payThreeEleven(elevenBet.bet);
-                    }
-                    break;
-                case 12:
-                    if (hornBet.hornBetOn) {
-                        bank += hornBet.payTwoTwelveHorn(hornBet.bet);
-                        bankDelta += hornBet.payTwoTwelveHorn(hornBet.bet);
-                    }
-                    if (crapsBet.crapsBetOn) {
-                        bank += crapsBet.payCraps(crapsBet.bet);
-                        bankDelta += crapsBet.payCraps(crapsBet.bet);
-                    }
-                    if (twoBet.twoBetOn) {
-                        bank += twelveBet.payTwoTwelveSingle(twelveBet.bet);
-                        bankDelta += twelveBet.payTwoTwelveSingle(twelveBet.bet);
-                    }
-                    break;
-            }
-            SingleBet.twoBetOn = false;
-            SingleBet.threeBetOn = false;
-            SingleBet.elevenBetOn = false;
-            SingleBet.twelveBetOn = false;
-            SingleBet.crapsBetOn = false;
-            SingleBet.hornBetOn = false; //turn everything off after running the results
+
+
 
 
             hardBets(hardBetOn, pointRoundResult, die1, die2); //this handles the "hard" bets AKA doubles

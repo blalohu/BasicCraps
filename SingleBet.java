@@ -3,6 +3,7 @@ public class SingleBet extends PayBet {
     static boolean crapsBetOn;
     static boolean twoBetOn, threeBetOn, elevenBetOn, twelveBetOn; // to avoid things getting all null pointery.
 
+    int bet;
     public int setBet(int bet) {
         if (hornBetOn) {
             while (bet % 4 != 0) {

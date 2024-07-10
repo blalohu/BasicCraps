@@ -11,6 +11,12 @@ Some things to do are to standardize these implementations into the older code, 
 explain the basic rules of craps, but these are far future considerations and this has already gone beyond my original
 scope. To avoid feature creep, I will finish what I have first. I also need to add Come bets, but this should be fairly
 easy as it's just another implementation of the comeOut and Pass code.
+
+I have also realized that the betTable array I used to organize my loops has made such variables as "hardFourOn"
+redundant, since there's now a very neat way to both store its boolean status and the bet contained therein, but that's
+too much work to declutter for now. What matters is that the code does work, and that it is understandable. Just very,
+very redundant. I suppose "HardFourOn" is at least more human readable than the arbitrary order I placed the indeces
+of BetTable[boolean][bet] in, so there is at least that benefit.
  */
 //TODO: Annotate the methods better to explain the code. Get in the habit of this.
 //TODO Move these variable declarations closer to the spot where they are relevant.
@@ -64,7 +70,7 @@ public class Craps {
         System.out.println("Pass or Don't Pass?");
         System.out.println("Please type \"pass\" or \"don't\"");
 
-        String setPass = "";
+        String setPass;
         do {
             setPass = crapsScanner.next();
         } while (!setPass.equalsIgnoreCase("pass") && !setPass.equalsIgnoreCase("don't"));
@@ -75,6 +81,11 @@ public class Craps {
 
         System.out.println("What's your bet? You currently have " + bank + ".");
         int passBet = crapsScanner.nextInt();
+        while (passBet < 5) {
+            System.out.println("The table minimum is 5.");
+            System.out.println("What is your bet?");
+            passBet = crapsScanner.nextInt();
+        }
         bank -= passBet; // deduct money from bank
         bankDelta -= passBet;
 
@@ -122,6 +133,7 @@ public class Craps {
         }
         return passBet;
     }
+    static int[][] betTable = new int[2][12];
 
     static void pointRound(int point, int passBet, boolean pass) {
         String placeBet;
@@ -135,9 +147,9 @@ public class Craps {
         SetBet crapsBet = null;
 
 
-
-
         PayBet payout = new PayBet();
+        String[] betTypes = {"Odds","Field","Eleven","Two","Three","Twelve","Horn","Craps","Hard 4","Hard 10","Hard 6",
+        "Hard 8"};
         do {
             System.out.println("The point is now on: " + point);
             System.out.println("Roll again shooter, or place more bets?");
@@ -145,6 +157,12 @@ public class Craps {
             // The default bet still stands from the pass line
             do {
                 System.out.println("Type either bet or roll");
+                System.out.println("Your current standing bets are:");
+                for (int j = 0; j < betTable.length; j++){
+                    if (betTable[1][j] != 0){
+                        System.out.println("\tYou have " + betTable[1][j] + " on " + betTypes[j] + ".");
+                    }
+                }
                 placeBet = crapsScanner.next();
             } while (!placeBet.equalsIgnoreCase("bet") && !placeBet.equalsIgnoreCase("roll"));
 
@@ -250,6 +268,12 @@ public class Craps {
                     System.out.println("Sorry bud, looks like odds weren't in your favor for the place bets.");
                 }
                 SetBet.singleBetFlag = false;
+                SetBet.twoBetOn = false; betTable [0][3] = 0; betTable [1][3] = 0;
+                SetBet.threeBetOn = false; betTable[0][4] = 0; betTable [1][4] = 0;
+                SetBet.crapsBetOn = false; betTable[0][7] = 0; betTable [1][7] = 0;
+                SetBet.hornBetOn = false; betTable[0][6] = 0; betTable [1][6] = 0;
+                SetBet.elevenBetOn = false; betTable[0][2] = 0; betTable [1][2] = 0;
+                SetBet.twelveBetOn = false; betTable[0][5] = 0; betTable [1][5] = 0;
             }
 
 
@@ -263,11 +287,13 @@ public class Craps {
                         oddsBetOn = true;
                         System.out.println("Betting odds on " + point);
                         oddsBet(oddsBetOn, pointRoundResult, point);
+                        betTable[0][0] = 1;
                         break;
                     case "FIELD":
                         fieldBetOn = true;
                         System.out.println("Betting on the Field, 2, 3, 4, 9, 10, 11, 12");
                         System.out.println("Pays 1:1. Snake Eyes is 2:1 and Boxcars are 3:1");
+                        betTable[0][1] = 1;
                         break;
                     case "ELEVEN":
                         elevenBet = new SetBet();
@@ -276,6 +302,8 @@ public class Craps {
                         elevenBet.setBet(bet, bank, bankDelta);
                         elevenBet.elevenBetOn = true;
                         SetBet.singleBetFlag = true;
+                        betTable[0][2] = 1;
+                        betTable[1][2] = bet;
                         break;
                     case "TWO":
                         twoBet = new SetBet();
@@ -284,6 +312,8 @@ public class Craps {
                         twoBet.setBet(bet, bank, bankDelta);
                         twoBet.twoBetOn = true;
                         SetBet.singleBetFlag = true;
+                        betTable[0][3] = 1;
+                        betTable[1][3] = bet;
                         break;
                     case "THREE":
                         threeBet = new SetBet();
@@ -292,6 +322,8 @@ public class Craps {
                         threeBet.setBet(bet, bank, bankDelta);
                         threeBet.threeBetOn = true;
                         SetBet.singleBetFlag = true;
+                        betTable[0][4] = 1;
+                        betTable[1][4] = bet;
                         break;
                     case "TWELVE":
                         twelveBet = new SetBet();
@@ -300,6 +332,8 @@ public class Craps {
                         twelveBet.setBet(bet, bank, bankDelta);
                         twelveBet.twelveBetOn = true;
                         SetBet.singleBetFlag = true;
+                        betTable[0][5] = 1;
+                        betTable[1][5] = bet;
                         break;
                     case "HORN":
                         hornBet = new SetBet();
@@ -310,6 +344,8 @@ public class Craps {
                         hornBet.setBet(bet, bank, bankDelta);
                         hornBet.hornBetOn = true;
                         SetBet.singleBetFlag = true;
+                        betTable[0][6] = 1;
+                        betTable[1][6] = bet;
                         break;
                     case "CRAPS":
                         crapsBet = new SetBet();
@@ -319,6 +355,8 @@ public class Craps {
                         crapsBet.setBet(bet, bank, bankDelta);
                         crapsBet.crapsBetOn = true;
                         SetBet.singleBetFlag = true;
+                        betTable[0][7] = 1;
+                        betTable[1][7] = bet;
                         break;
                     case "HARD4":
                         hardFourBet = new SetBet();
@@ -328,6 +366,8 @@ public class Craps {
                         System.out.println("How much would you like to bet?");
                         bet = crapsScanner.nextInt();
                         hardFourBet.setBet(bet, bank, bankDelta);
+                        betTable[0][8] = 1;
+                        betTable[1][8] = bet;
                         break;
                     case "HARD10":
                         hardTenBet = new SetBet();
@@ -337,6 +377,8 @@ public class Craps {
                         System.out.println("How much would you like to bet?");
                         bet = crapsScanner.nextInt();
                         hardTenBet.setBet(bet, bank, bankDelta);
+                        betTable[0][9] = 1;
+                        betTable[1][9] = bet;
                         break;
                     case "HARD6":
                         hardSixBet = new SetBet();
@@ -346,6 +388,8 @@ public class Craps {
                         System.out.println("How much would you like to bet?");
                         bet = crapsScanner.nextInt();
                         hardSixBet.setBet(bet, bank, bankDelta);
+                        betTable[0][10] = 1;
+                        betTable[1][10] = bet;
                         break;
                     case "HARD8":
                         SetBet hardEightBet = new SetBet();
@@ -355,6 +399,11 @@ public class Craps {
                         System.out.println("How much would you like to bet?");
                         bet = crapsScanner.nextInt();
                         hardEightBet.setBet(bet, bank, bankDelta);
+                        betTable[0][11] = 1;
+                        betTable[1][11] = bet;
+                        break;
+                    default:
+                        System.out.println("That is not a recognized bet, please try again.");
                         break;
                 }
             }
@@ -495,24 +544,11 @@ public class Craps {
 
     public static void fieldBet(boolean fieldBetOn, int pointRoundResult) {
 
-
-        if (fieldBetOn && !fieldPayoutOn) {
-            System.out.println("What's your bet on field? House minimum is 5");
-            fieldBet = crapsScanner.nextInt();
-            while (fieldBet < 5) {
-                System.out.println("House minimum is 5, ser");
-                fieldBet = crapsScanner.nextInt();
-            }
-            bank -= fieldBet;
-            bankDelta -= fieldBet;
-            fieldPayoutOn = true;
-        }
         int index;
         PayBet payout = new PayBet();
         for (index = 0; index < 7; index++) {
             if (pointRoundResult == fieldRelevant[index] && fieldPayoutOn) {
                 if (pointRoundResult == 2) {
-
                     System.out.println("Field is 2, pays double");
                     System.out.println("You were paid out " + payout.payFieldTwo(fieldBet));
                     bank += payout.payFieldTwo(fieldBet);
@@ -524,7 +560,6 @@ public class Craps {
                     bank += payout.payFieldTwelve(fieldBet);
                     bankDelta += payout.payFieldTwelve(fieldBet);
                 } else {
-
                     System.out.println(pointRoundResult + " is on the field, you were paid " + payout.payEven(fieldBet));
                     bank += payout.payEven(fieldBet);
                     bankDelta += payout.payEven(fieldBet);
@@ -536,6 +571,17 @@ public class Craps {
             System.out.println("Sorry, that number isn't on the field, you lost " + fieldBet);
             fieldBetOn = false;
         }
+        if (fieldBetOn && !fieldPayoutOn) {
+            System.out.println("What's your bet on field? House minimum is 5");
+            fieldBet = crapsScanner.nextInt();
+            while (fieldBet < 5) {
+                System.out.println("House minimum is 5, ser");
+                fieldBet = crapsScanner.nextInt();
+            }
+            bank -= fieldBet;
+            bankDelta -= fieldBet;
+            fieldPayoutOn = true;
+        }
     }
 
     static boolean hardFourOn;
@@ -546,11 +592,12 @@ public class Craps {
     static SetBet hardSixBet;
     static SetBet hardEightBet;
     static SetBet hardTenBet;
+
     public static void hardBets(boolean hardBetOn, int pointRoundResult, int die1, int die2) {
 
         if (hardBetOn) {
             if (hardFourOn) {
-                if (pointRoundResult == 4 && die1 == die2){
+                if (pointRoundResult == 4 && die1 == die2) {
                     System.out.println("Four the hard way, you win!");
                     bank += hardFourBet.payFourTenHard(hardFourBet.bet);
                     bankDelta += hardFourBet.payFourTenHard(hardFourBet.bet);
@@ -563,7 +610,7 @@ public class Craps {
                 }
             }
             if (hardSixOn) {
-                if (pointRoundResult == 6 && die1 == die2){
+                if (pointRoundResult == 6 && die1 == die2) {
                     System.out.println("Six the hard way, you win!");
                     bank += hardSixBet.paySixEightHard(hardSixBet.bet);
                     bankDelta += hardSixBet.paySixEightHard(hardSixBet.bet);
@@ -589,7 +636,7 @@ public class Craps {
                 }
             }
             if (hardTenOn) {
-                if (pointRoundResult == 10 && die1 == die2){
+                if (pointRoundResult == 10 && die1 == die2) {
                     System.out.println("10 the hard way, you win!");
                     bank += hardTenBet.payFourTenHard(hardTenBet.bet);
                     bankDelta += hardTenBet.payFourTenHard(hardTenBet.bet);
@@ -603,7 +650,7 @@ public class Craps {
             }
             if (pointRoundResult == 7) {
                 System.out.println("Sevened out, hard bets are cleared.");
-                hardFourOn = false;
+                hardFourOn = false; //Add these to the table
                 hardSixOn = false;
                 hardEightOn = false;
                 hardTenOn = false;

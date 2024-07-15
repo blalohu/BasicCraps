@@ -147,17 +147,18 @@ public class Craps {
     static final int HARD_TEN = 9;
     static final int HARD_SIX = 10;
     static final int HARD_EIGHT = 11;
-
-    static void pointRound(int point, int passBet, boolean pass) {
-        String placeBet;
-        int die1 = 0;
-        int die2 = 0;
-        SetBet twoBet = null;
+SetBet twoBet = null;
         SetBet threeBet = null;
         SetBet twelveBet = null;
         SetBet elevenBet = null;
         SetBet hornBet = null;
         SetBet crapsBet = null;
+
+    static void pointRound(int point, int passBet, boolean pass) {
+        String placeBet;
+        int die1 = 0;
+        int die2 = 0;
+        
 
 
         PayBet payout = new PayBet();

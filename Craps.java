@@ -289,12 +289,15 @@ SetBet twoBet = null;
                     System.out.println("Sorry bud, looks like odds weren't in your favor for the place bets.");
                 }
                 SetBet.singleBetFlag = false;
-                betTable[0][TWO] = 0; betTable [1][3] = 0;
-                betTable[0][THREE] = 0; betTable [1][4] = 0;
-                betTable[0][CRAPS] = 0; betTable [1][7] = 0;
-                betTable[0][HORN] = 0; betTable [1][6] = 0;
-                betTable[0][ELEVEN] = 0; betTable [1][2] = 0;
-                betTable[0][TWELVE] = 0; betTable [1][5] = 0;
+for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
+    for (int resetTotal = 0; resetTotal < betTable.length; resetTotal++;) {
+        if (resetTotal == ODDS || resetTotal == FIELD) { continue; }
+        betTable[1][resetTotal] = 0;
+        }
+        if (resetFlag == ODDS || resetFlag == FIELD) { continue; }
+        betTable[0][resetFlag] = 0;
+        }
+    
             }
 
 

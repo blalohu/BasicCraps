@@ -1,21 +1,20 @@
 
-public class SetBet extends PayBet {
-    static boolean hornBetOn;
-    static boolean crapsBetOn;
-    static boolean twoBetOn, threeBetOn, elevenBetOn, twelveBetOn; // to avoid things getting all null pointery.
+public class SetBet extends PayBet{
+    static boolean hornBetCheck;
 
-    int bet;
-    static boolean singleBetFlag;
-    public void setBet(int bet, int bank, int bankDelta) {
-        if (hornBetOn) {
-            while (bet % 4 != 0) {
-                System.out.println("Sorry, bets on the horn must be in multiples of 4");
-                System.out.println("We can't give change");
-                bet = Craps.crapsScanner.nextInt();
 
-            }
+    SetBet(int bet) {
+        this.bet = bet;
+        while (hornBetCheck && bet % 4 != 0) {
+            System.out.println("Horn bets must be in multiples of 4, please try again.");
+            bet = Craps.crapsScanner.nextInt();
         }
+        hornBetCheck = false;
         Craps.bank -= bet;
         Craps.bankDelta -= bet;
     }
+
+
+    int bet;
+    static boolean singleBetFlag;
 }

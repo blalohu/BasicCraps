@@ -30,9 +30,8 @@ public class Craps {
     public static boolean pass;
     public static int pointRoundResult;
     public static boolean oddsBetPayoutOn, oddsBetOn;
-    public static int oddsNumber, oddsBet;
     public static boolean fieldPayoutOn, fieldBetOn;
-    public static int fieldBet;
+
 
 
     public static void main(String[] args) {
@@ -76,64 +75,57 @@ public class Craps {
         System.out.println("You chose " + setPass + "."); // confirmation
 
         System.out.println("What's your bet? You currently have " + bank + ".");
-        SetBet passBet = new SetBet(crapsScanner.nextInt());
-        while (passBet.bet < 5) {
-            System.out.println("The table minimum is 5.");
-            System.out.println("What is your bet?");
-            bank += passBet.bet;                        //undo the erroneous bank withdrawal.
-            bankDelta += passBet.bet;
-            passBet.bet = crapsScanner.nextInt();
-            bank -= passBet.bet;
-            bankDelta -= passBet.bet;
-        }
+        SetBet pass = new SetBet(crapsScanner.nextInt());
+        SetBet.tableMinimumCheck = true;
 
         if (setPass.equalsIgnoreCase("pass")) {
-            pass = true;
-            System.out.println(passBet + " on the " + setPass + " line.");
+            Craps.pass = true;
+            System.out.println(pass + " on the " + setPass + " line.");
         }
         if (!setPass.equalsIgnoreCase("pass")) {
-            pass = false;
-            System.out.println(passBet + " on the " + setPass + " line.");
+            Craps.pass = false;
+            System.out.println(pass + " on the " + setPass + " line.");
         }
 
         System.out.println("[" + die1 + "]" + " [" + die2 + "]");
         PayBet payout = new PayBet();
         if (result == 7 || result == 11) {
-            if (pass) {
+            if (Craps.pass) {
                 System.out.println(result + " on the come out, pass pays even!");
-                bank += payout.payEven(passBet.bet);
-                bankDelta += payout.payEven(passBet.bet);
+                bank += payout.payEven(pass.bet);
+                bankDelta += payout.payEven(pass.bet);
             }
-            if (!pass) {
+            if (!Craps.pass) {
                 System.out.println(result + " on the come out, don't pass loses.");
             }
             endGame();
         }
         if (result == 2 || result == 3) {
-            if (pass) {
+            if (Craps.pass) {
                 System.out.println("Craps out, better luck next time.");
             }
-            if (!pass) {
+            if (!Craps.pass) {
                 System.out.println("Craps out on the come out, don't pass pays even!");
-                bank += payout.payEven(passBet.bet);
+                bank += payout.payEven(pass.bet);
             }
             endGame();
         }
         if (result == 12) {
-            if (pass) {
+            if (Craps.pass) {
                 System.out.println("Boxcars craps out, pass loses.");
             }
-            if (!pass) {
+            if (!Craps.pass) {
                 System.out.println("Boxcars pushes don't pass, try again.");
-                bank += passBet.bet;
+                bank += pass.bet;
             }
             endGame();
         }
-        return passBet.bet;
+        return pass.bet;
     }
+
     static int[][] betTable = new int[2][12];
 
-    static String[] betTypes = {"Odds","Field","Eleven","Two","Three","Twelve","Horn","Craps","Hard 4","Hard 10","Hard 6",
+    static String[] betTypes = {"Odds", "Field", "Eleven", "Two", "Three", "Twelve", "Horn", "Craps", "Hard 4", "Hard 10", "Hard 6",
             "Hard 8"};
     static final int ODDS = 0;         //These are so I can reference the indexes in betTable by name rather
     static final int FIELD = 1;        //than by a series of indeces in an arbitrary order.
@@ -147,18 +139,17 @@ public class Craps {
     static final int HARD_TEN = 9;
     static final int HARD_SIX = 10;
     static final int HARD_EIGHT = 11;
-SetBet twoBet = null;
-        SetBet threeBet = null;
-        SetBet twelveBet = null;
-        SetBet elevenBet = null;
-        SetBet hornBet = null;
-        SetBet crapsBet = null;
+    static SetBet two;
+    static SetBet three;
+    static SetBet twelve;
+    static SetBet eleven;
+    static SetBet horn;
+    static SetBet craps;
 
     static void pointRound(int point, int passBet, boolean pass) {
         String placeBet;
         int die1 = 0;
         int die2 = 0;
-        
 
 
         PayBet payout = new PayBet();
@@ -171,8 +162,8 @@ SetBet twoBet = null;
             do {
                 System.out.println("Type either bet or roll");
                 System.out.println("Your current standing bets are:");
-                for (int j = 0; j < betTable.length; j++){
-                    if (betTable[0][j] != 0){
+                for (int j = 0; j < betTable.length; j++) {
+                    if (betTable[0][j] != 0) {
                         System.out.println("\t" + betTable[1][j] + " on " + betTypes[j] + ".");
                     }
                 }
@@ -216,36 +207,36 @@ SetBet twoBet = null;
                 switch (pointRoundResult) { //For Single Round bets being paid out.
                     case 2:
                         if (betTable[0][HORN] == 1) {
-                            bank += hornBet.payTwoTwelveHorn(hornBet.bet);
-                            bankDelta += hornBet.payTwoTwelveHorn(hornBet.bet);
-                            System.out.println("Two is in the horn! You were paid out " + hornBet.payTwoTwelveHorn(hornBet.bet));
+                            bank += horn.payTwoTwelveHorn(horn.bet);
+                            bankDelta += horn.payTwoTwelveHorn(horn.bet);
+                            System.out.println("Two is in the horn! You were paid out " + horn.payTwoTwelveHorn(horn.bet));
                             payFlag = true;
                         }
                         if (betTable[0][CRAPS] == 1) {
-                            bank += crapsBet.payCraps(crapsBet.bet);
-                            bankDelta += crapsBet.payCraps(crapsBet.bet);
+                            bank += craps.payCraps(craps.bet);
+                            bankDelta += craps.payCraps(craps.bet);
                             payFlag = true;
                         }
                         if (betTable[0][TWO] == 1) {
-                            bank += twoBet.payTwoTwelveSingle(twoBet.bet);
-                            bankDelta += twoBet.payTwoTwelveSingle(twoBet.bet);
+                            bank += two.payTwoTwelveSingle(two.bet);
+                            bankDelta += two.payTwoTwelveSingle(two.bet);
                             payFlag = true;
                         }
                         break;
                     case 3:
                         if (betTable[0][HORN] == 1) {
-                            bank += hornBet.payThreeElevenHorn(hornBet.bet);
-                            bankDelta += hornBet.payThreeElevenHorn(hornBet.bet);
+                            bank += horn.payThreeElevenHorn(horn.bet);
+                            bankDelta += horn.payThreeElevenHorn(horn.bet);
                             payFlag = true;
                         }
                         if (betTable[0][CRAPS] == 1) {
-                            bank += crapsBet.payCraps(crapsBet.bet);
-                            bankDelta += crapsBet.payCraps(crapsBet.bet);
+                            bank += craps.payCraps(craps.bet);
+                            bankDelta += craps.payCraps(craps.bet);
                             payFlag = true;
                         }
                         if (betTable[0][THREE] == 1) {
-                            bank += threeBet.payThreeEleven(threeBet.bet);
-                            bankDelta += threeBet.payThreeEleven(threeBet.bet);
+                            bank += three.payThreeEleven(three.bet);
+                            bankDelta += three.payThreeEleven(three.bet);
                             payFlag = true;
                         }
                         break;
@@ -255,30 +246,30 @@ SetBet twoBet = null;
 
                     case 11:
                         if (betTable[0][HORN] == 1) {
-                            bank += hornBet.payThreeElevenHorn(hornBet.bet);
-                            bankDelta += hornBet.payThreeElevenHorn(hornBet.bet);
+                            bank += horn.payThreeElevenHorn(horn.bet);
+                            bankDelta += horn.payThreeElevenHorn(horn.bet);
                             payFlag = true;
                         }
                         if (betTable[0][ELEVEN] == 1) {
-                            bank += elevenBet.payThreeEleven(elevenBet.bet);
-                            bankDelta += elevenBet.payThreeEleven(elevenBet.bet);
+                            bank += eleven.payThreeEleven(eleven.bet);
+                            bankDelta += eleven.payThreeEleven(eleven.bet);
                             payFlag = true;
                         }
                         break;
                     case 12:
                         if (betTable[0][HORN] == 1) {
-                            bank += hornBet.payTwoTwelveHorn(hornBet.bet);
-                            bankDelta += hornBet.payTwoTwelveHorn(hornBet.bet);
+                            bank += horn.payTwoTwelveHorn(horn.bet);
+                            bankDelta += horn.payTwoTwelveHorn(horn.bet);
                             payFlag = true;
                         }
                         if (betTable[0][CRAPS] == 1) {
-                            bank += crapsBet.payCraps(crapsBet.bet);
-                            bankDelta += crapsBet.payCraps(crapsBet.bet);
+                            bank += craps.payCraps(craps.bet);
+                            bankDelta += craps.payCraps(craps.bet);
                             payFlag = true;
                         }
                         if (betTable[0][TWELVE] == 1) {
-                            bank += twelveBet.payTwoTwelveSingle(twelveBet.bet);
-                            bankDelta += twelveBet.payTwoTwelveSingle(twelveBet.bet);
+                            bank += twelve.payTwoTwelveSingle(twelve.bet);
+                            bankDelta += twelve.payTwoTwelveSingle(twelve.bet);
                             payFlag = true;
                         }
                         break;
@@ -289,15 +280,22 @@ SetBet twoBet = null;
                     System.out.println("Sorry bud, looks like odds weren't in your favor for the place bets.");
                 }
                 SetBet.singleBetFlag = false;
-for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
-    for (int resetTotal = 0; resetTotal < betTable.length; resetTotal++;) {
-        if (resetTotal == ODDS || resetTotal == FIELD) { continue; }
-        betTable[1][resetTotal] = 0;
-        }
-        if (resetFlag == ODDS || resetFlag == FIELD) { continue; }
-        betTable[0][resetFlag] = 0;
-        }
-    
+
+                //This should not reset the hard bets, which all occur after index 7, so we make it stop when it reaches
+                //the hard bets.
+                for (int resetFlag = 0; resetFlag < HARD_FOUR; resetFlag++){
+                    for (int resetTotal = 0; resetTotal < HARD_FOUR; resetTotal++){
+                        if (resetTotal == ODDS || resetTotal == FIELD) {
+                            continue;
+                        }
+                        betTable[1][resetTotal] = 0;
+                    }
+                    if (resetFlag == ODDS || resetFlag == FIELD) {
+                        continue;
+                    }
+                    betTable[0][resetFlag] = 0;
+                }
+
             }
 
 
@@ -319,49 +317,49 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
                         betTable[0][FIELD] = 1;
                         break;
                     case "ELEVEN":
-                        elevenBet = new SetBet(crapsScanner.nextInt());
+                        eleven = new SetBet(crapsScanner.nextInt());
                         System.out.println("Betting on 11, odds 15:1");
                         SetBet.singleBetFlag = true;
                         betTable[0][ELEVEN] = 1;
-                        betTable[1][ELEVEN] = elevenBet.bet;
+                        betTable[1][ELEVEN] = eleven.bet;
                         break;
                     case "TWO":
-                        twoBet = new SetBet(crapsScanner.nextInt());
+                        two = new SetBet(crapsScanner.nextInt());
                         System.out.println("Betting on Snake Eyes, odds are 30:1");
                         SetBet.singleBetFlag = true;
                         betTable[0][TWO] = 1;
-                        betTable[1][TWO] = twoBet.bet;
+                        betTable[1][TWO] = two.bet;
                         break;
                     case "THREE":
-                        threeBet = new SetBet(crapsScanner.nextInt());
+                        three = new SetBet(crapsScanner.nextInt());
                         System.out.println("Betting Ace Deuce, odds are 15:1");
                         SetBet.singleBetFlag = true;
                         betTable[0][THREE] = 1;
-                        betTable[1][THREE] = threeBet.bet;
+                        betTable[1][THREE] = three.bet;
                         break;
                     case "TWELVE":
-                        twelveBet = new SetBet(crapsScanner.nextInt());
+                        twelve = new SetBet(crapsScanner.nextInt());
                         System.out.println("Betting on Boxcars, odds are 30:1");
                         SetBet.singleBetFlag = true;
                         betTable[0][TWELVE] = 1;
-                        betTable[1][TWELVE] = twelveBet.bet;
+                        betTable[1][TWELVE] = twelve.bet;
                         break;
                     case "HORN":
-                        hornBet = new SetBet(crapsScanner.nextInt());
+                        horn = new SetBet(crapsScanner.nextInt());
                         System.out.println("Betting equally on 2, 3, 11 and 12");
                         System.out.println("We pay 27:4 on 2 and 12, and 3:1 on 3 or 11");
                         System.out.println("Multiples of 4 only please; we don't give change");
                         SetBet.hornBetCheck = true;
                         betTable[0][HORN] = 1;
-                        betTable[1][HORN] = hornBet.bet;
+                        betTable[1][HORN] = horn.bet;
                         break;
                     case "CRAPS":
-                        crapsBet = new SetBet(crapsScanner.nextInt());
+                        craps = new SetBet(crapsScanner.nextInt());
                         System.out.println("Betting on Craps: 2, 3 or 11.");
                         System.out.println("Odds are 7:1");
                         SetBet.singleBetFlag = true;
                         betTable[0][CRAPS] = 1;
-                        betTable[1][CRAPS] = crapsBet.bet;
+                        betTable[1][CRAPS] = craps.bet;
                         break;
                     case "HARD4":
                         hardFourBet = new SetBet(crapsScanner.nextInt());
@@ -404,11 +402,12 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
                         break;
                 }
             }
-            oddsBet(oddsBetOn, pointRoundResult, oddsNumber);
+            oddsBet(oddsBetOn, pointRoundResult, point);
             fieldBet(fieldBetOn, pointRoundResult);
             hardBets(hardBetOn, pointRoundResult, die1, die2); //this handles the "hard" bets AKA doubles
         } while (pointRoundResult != point && pointRoundResult != 7);
     }
+    static SetBet odds;
 
     public static void oddsBet(boolean oddsBetOn, int result, int point) {
 
@@ -417,47 +416,47 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
             if (!oddsBetPayoutOn && pass) {
                 System.out.println("You've placed odds on " + point);
                 System.out.println("How much would you like to bet?");
-                SetBet oddsBet = new SetBet(crapsScanner.nextInt());
-                betTable[1][ODDS] = oddsBet.bet;
-                while ((point == 6 || point == 8) && oddsBet.bet % 6 != 0) {
+                odds = new SetBet(crapsScanner.nextInt());
+                betTable[1][ODDS] = odds.bet;
+                while ((point == 6 || point == 8) && odds.bet % 6 != 0) {
                     System.out.println("Please enter a multiple of 6 for odds on 6 and 8");
                     System.out.println("We do not give change");
                     //returns money before setting the fixed bet
-                    bank += oddsBet.bet;
-                    bankDelta += oddsBet.bet;
-                    oddsBet = new SetBet(crapsScanner.nextInt());
-                    betTable[1][ODDS] = oddsBet.bet;
+                    bank += odds.bet;
+                    bankDelta += odds.bet;
+                    odds = new SetBet(crapsScanner.nextInt());
+                    betTable[1][ODDS] = odds.bet;
                 }
-                while ((point == 5 || point == 9) && (oddsBet.bet % 2 != 0 && oddsBet.bet < 6)) {
+                while ((point == 5 || point == 9) && (odds.bet % 2 != 0 && odds.bet < 6)) {
                     System.out.println("Please enter a multiple of 2 that is 6 or greater");
                     System.out.println("We do not give change");
                     //returns money before the fixed bet
-                    bank += oddsBet.bet;
-                    bankDelta += oddsBet.bet;
-                    oddsBet = new SetBet(crapsScanner.nextInt());
-                    betTable[1][ODDS] = oddsBet.bet;
+                    bank += odds.bet;
+                    bankDelta += odds.bet;
+                    odds = new SetBet(crapsScanner.nextInt());
+                    betTable[1][ODDS] = odds.bet;
                 }
             }
             if (!oddsBetPayoutOn && !pass) {
                 System.out.println("You've placed odds against " + point);
                 System.out.println("How much would you like to bet?");
-                SetBet oddsBet = new SetBet(crapsScanner.nextInt());
-                while (oddsBet.bet % 6 != 0) {
+                odds = new SetBet(crapsScanner.nextInt());
+                while (odds.bet % 6 != 0) {
                     System.out.println("Please enter a multiple of 6 for odds on 6 and 8");
                     System.out.println("We do not give change");
                     //returns money before setting the fixed bet
-                    bank += oddsBet.bet;
-                    bankDelta += oddsBet.bet;
-                    oddsBet = new SetBet(crapsScanner.nextInt());
-                    betTable[1][ODDS] = oddsBet.bet;
+                    bank += odds.bet;
+                    bankDelta += odds.bet;
+                    odds = new SetBet(crapsScanner.nextInt());
+                    betTable[1][ODDS] = odds.bet;
                 }
             }
             if (pass && !oddsBetPayoutOn) {
-                System.out.println("Very well, you've placed " + oddsBet + " on " + point);
+                System.out.println("Very well, you've placed " + odds.bet + " on " + point);
                 oddsBetPayoutOn = true;
             }
             if (!pass && !oddsBetPayoutOn) {
-                System.out.println("Very well, you've placed " + oddsBet + " against " + point);
+                System.out.println("Very well, you've placed " + odds.bet + " against " + point);
                 oddsBetPayoutOn = true;
             }
         }
@@ -466,38 +465,36 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
             if (pass) {
                 if (result == 6 && point == 6 || result == 8 && point == 8) {
                     System.out.println("You've paid out your odds on " + point);
-                    System.out.println("You were paid out" + payout.payOddsSixEight(oddsBet));
-                    bank += payout.payOddsSixEight(oddsBet);
-                    bankDelta += payout.payOddsSixEight(oddsBet);
-                    oddsBet = 0;
+                    System.out.println("You were paid out" + payout.payOddsSixEight(odds.bet));
+                    bank += payout.payOddsSixEight(odds.bet);
+                    bankDelta += payout.payOddsSixEight(odds.bet);
                     betTable[1][ODDS] = 0;
                     oddsBetPayoutOn = false;
 
                 }
                 if (result == 5 && point == 5 || result == 9 && point == 9) {
                     System.out.println("You've paid out your odds on " + point);
-                    System.out.println("You were paid out " + payout.payOddsFiveNine(oddsBet));
-                    bank += payout.payOddsFiveNine(oddsBet);
-                    bankDelta += payout.payOddsFiveNine(oddsBet);
-                    oddsBet = 0;
+                    System.out.println("You were paid out " + payout.payOddsFiveNine(odds.bet));
+                    bank += payout.payOddsFiveNine(odds.bet);
+                    bankDelta += payout.payOddsFiveNine(odds.bet);
                     betTable[1][ODDS] = 0;
                     oddsBetPayoutOn = false;
 
                 }
                 if (result == 4 && point == 4 || result == 10 && point == 10) {
                     System.out.println("You've paid out your odds on " + point);
-                    System.out.println("You were paid out " + payout.payOddsFourTen(oddsBet));
-                    bank += payout.payOddsFourTen(oddsBet);
-                    bankDelta += payout.payOddsFourTen(oddsBet);
-                    oddsBet = 0;
+                    System.out.println("You were paid out " + payout.payOddsFourTen(odds.bet));
+                    bank += payout.payOddsFourTen(odds.bet);
+                    bankDelta += payout.payOddsFourTen(odds.bet);
+                    odds.bet = 0;
                     betTable[1][ODDS] = 0;
                     oddsBetPayoutOn = false;
 
                 }
                 if (result == 7) {
                     System.out.println("Unlucky, you've lost your odds");
-                    System.out.println("You lost " + oddsBet);
-                    oddsBet = 0;
+                    System.out.println("You lost " + odds.bet);
+                    odds.bet = 0;
                     betTable[1][ODDS] = 0;
                     oddsBetPayoutOn = false;
 
@@ -518,38 +515,38 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
                         clearBit = true;
                     }
                     if (clearBit) {
-                        oddsBet = 0;
                         betTable[1][ODDS] = 0;
                         oddsBetPayoutOn = false;
-                        clearBit = false;
                     }
                 }
                 if (result == 7) {
                     System.out.println("Seven out pays your odds against " + point + "!");
                     System.out.println("You were paid ");
                     if (point == 6 || point == 8) {
-                        System.out.print(payout.payAgainstSixEight(oddsBet));
-                        bank += payout.payAgainstSixEight(oddsBet);
-                        bankDelta += payout.payAgainstSixEight(oddsBet);
+                        System.out.print(payout.payAgainstSixEight(odds.bet));
+                        bank += payout.payAgainstSixEight(odds.bet);
+                        bankDelta += payout.payAgainstSixEight(odds.bet);
                     }
                     if (point == 5 || point == 9) {
-                        System.out.print(payout.payAgainstFiveNine(oddsBet));
-                        bank += payout.payAgainstFiveNine(oddsBet);
-                        bankDelta += payout.payAgainstFiveNine(oddsBet);
+                        System.out.print(payout.payAgainstFiveNine(odds.bet));
+                        bank += payout.payAgainstFiveNine(odds.bet);
+                        bankDelta += payout.payAgainstFiveNine(odds.bet);
                     }
                     if (point == 4 || point == 10) {
-                        System.out.print(payout.payAgainstFourTen(oddsBet));
-                        bank += payout.payAgainstFourTen(oddsBet);
-                        bankDelta += payout.payAgainstFourTen(oddsBet);
+                        System.out.print(payout.payAgainstFourTen(odds.bet));
+                        bank += payout.payAgainstFourTen(odds.bet);
+                        bankDelta += payout.payAgainstFourTen(odds.bet);
                     }
-                    oddsBet = 0;
+                    odds.bet = 0;
                     betTable[1][ODDS] = 0;
                     oddsBetPayoutOn = false;
                 }
             }
         }
     }
-//todo implement the new class setbet system
+
+    static SetBet field;
+
     public static void fieldBet(boolean fieldBetOn, int pointRoundResult) {
 
         int index;
@@ -558,19 +555,19 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
             if (pointRoundResult == fieldRelevant[index] && fieldPayoutOn) {
                 if (pointRoundResult == 2) {
                     System.out.println("Field is 2, pays double");
-                    System.out.println("You were paid out " + payout.payFieldTwo(fieldBet));
-                    bank += payout.payFieldTwo(fieldBet);
-                    bankDelta += payout.payFieldTwo(fieldBet);
+                    System.out.println("You were paid out " + payout.payFieldTwo(field.bet));
+                    bank += payout.payFieldTwo(field.bet);
+                    bankDelta += payout.payFieldTwo(field.bet);
                 }
                 if (pointRoundResult == 12) {
                     System.out.println("Field is 12, pays triple");
-                    System.out.println("You were paid " + payout.payFieldTwelve(fieldBet));
-                    bank += payout.payFieldTwelve(fieldBet);
-                    bankDelta += payout.payFieldTwelve(fieldBet);
+                    System.out.println("You were paid " + payout.payFieldTwelve(field.bet));
+                    bank += payout.payFieldTwelve(field.bet);
+                    bankDelta += payout.payFieldTwelve(field.bet);
                 } else {
-                    System.out.println(pointRoundResult + " is on the field, you were paid " + payout.payEven(fieldBet));
-                    bank += payout.payEven(fieldBet);
-                    bankDelta += payout.payEven(fieldBet);
+                    System.out.println(pointRoundResult + " is on the field, you were paid " + payout.payEven(field.bet));
+                    bank += payout.payEven(field.bet);
+                    bankDelta += payout.payEven(field.bet);
                 }
                 fieldPayoutOn = false;
                 fieldBetOn = false;
@@ -578,19 +575,15 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
             }
         }
         if (index == 7 && fieldPayoutOn) {
-            System.out.println("Sorry, that number isn't on the field, you lost " + fieldBet);
+            System.out.println("Sorry, that number isn't on the field, you lost " + field.bet);
             fieldBetOn = false;
+            fieldPayoutOn = false;
         }
         if (fieldBetOn && !fieldPayoutOn) {
             System.out.println("What's your bet on field? House minimum is 5");
-            fieldBet = crapsScanner.nextInt();
-            while (fieldBet < 5) {
-                System.out.println("House minimum is 5, ser");
-                fieldBet = crapsScanner.nextInt();
-            }
-            bank -= fieldBet;
-            bankDelta -= fieldBet;
+            field = new SetBet(crapsScanner.nextInt());
             fieldPayoutOn = true;
+            SetBet.tableMinimumCheck = true;
         }
     }
 
@@ -665,7 +658,6 @@ for (int resetFlag = 0; resetFlag < betTable.length; resetFlag++;) {
                 hardSixOn = false;
                 hardEightOn = false;
                 hardTenOn = false;
-                hardBetOn = false;
             }
         }
     }
